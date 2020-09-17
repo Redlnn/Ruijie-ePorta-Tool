@@ -83,7 +83,6 @@ def main(system):
     # noinspection PyBroadException
     try:
         if system == 'Windows':
-            print('系统类型：' + system)
             result = os.system(u'ping 119.29.29.29 -n 1 -w 1500')
             si = subprocess.STARTUPINFO()
             si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
@@ -92,7 +91,6 @@ def main(system):
             DETACHED_PROCESS = 0x00000008
             subprocess.call('taskkill /F /IM exename.exe', startupinfo=si, creationflags=DETACHED_PROCESS, shell=False)
         else:
-            print('系统类型：' + system)
             result = os.system(u'ping 119.29.29.29 -c 1 -W 1500')
         if result == 0:
             connected()
@@ -114,6 +112,8 @@ if __name__ == '__main__':
     print('判断系统类型...')
     system1 = system_type()
     if system1 == 'Windows':
+        print('系统类型：' + system1)
+        print('检测多开中...')
         mutex_name = 'school_network'
         mutex = CreateMutex(None, False, mutex_name)
         if GetLastError() == ERROR_ALREADY_EXISTS:
@@ -121,8 +121,9 @@ if __name__ == '__main__':
             messagebox.showerror(title='警告', message='本程序不能同时运行多个实例，请不要多开')
             sys.exit(0)
         else:
-            print('程序启动中...')
+            print('没有多开，程序启动中...')
             main(system1)
     else:
+        print('系统类型：' + system1)
         print('程序启动中...')
         main(system1)

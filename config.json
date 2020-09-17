@@ -13,7 +13,6 @@
         "enable_disconnect": true
     },
     {
-        "此处为登录时传递给服务器的参数": "",
         "userId": "00000000000",
         "password": "",
         "service": "",
@@ -21,15 +20,12 @@
         "operatorPwd": "",
         "operatorUserId": "",
         "validcode": "",
-        "validcode为图形验证码": "若需要验证码登录则本程序不可用",
         "passwordEncrypt": ""
     },
     {
-        "此处为下线时传递给服务器的参数": "",
         "userIndex": ""
     },
     {
-        "此处为登录时使用的HTML Header": "",
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "Connection": "keep-alive",
         "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
@@ -37,7 +33,6 @@
         "Referer": ""
     },
     {
-        "此处为下线时使用的HTML Header": "",
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "Connection": "keep-alive",
         "Accept-Language": "zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7",
@@ -45,7 +40,6 @@
         "Referer": ""
     },
     {
-        "此处为登录时使用的cookie": "首次使用前请在校园网登录页面勾选保存密码",
         "EPORTAL_COOKIE_SAVEPASSWORD": "tre",
         "EPORTAL_AUTO_LAND": "",
         "EPORTAL_COOKIE_USERNAME": "",

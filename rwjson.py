@@ -38,7 +38,6 @@ def write_json():
     }
     # 登录传入参数
     login_data = {
-        '此处为登录时传递给服务器的参数': '',
         'userId': '00000000000',
         'password': '',
         'service': '',
@@ -46,17 +45,14 @@ def write_json():
         'operatorPwd': '',
         'operatorUserId': '',
         'validcode': '',
-        'validcode为图形验证码': '若需要验证码登录则本程序不可用',
         'passwordEncrypt': ''
     }
     # 断线传入参数
     logout_data = {
-        '此处为下线时传递给服务器的参数': '',
         'userIndex': '',
     }
     # 登录HTML Header
     login_header = {
-        '此处为登录时使用的HTML Header': '',
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         'Connection': 'keep-alive',
         'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
@@ -65,7 +61,6 @@ def write_json():
     }
     # 断线HTML Header
     logout_header = {
-        '此处为下线时使用的HTML Header': '',
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         'Connection': 'keep-alive',
         'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
@@ -74,7 +69,6 @@ def write_json():
     }
 
     cookie = {
-        '此处为登录时使用的cookie': '首次使用前请在校园网登录页面勾选保存密码',
         'EPORTAL_COOKIE_SAVEPASSWORD': 'tre',
         'EPORTAL_AUTO_LAND': '',
         'EPORTAL_COOKIE_USERNAME': '',
