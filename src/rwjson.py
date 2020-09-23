@@ -1,23 +1,24 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-import json
-import os
 import subprocess
 import sys
-from platform import system as system_type
+from json import dump as json_dump
+from json import load as json_load
+from os import system, path
+from platform import system as os_type
 from tkinter import Tk, messagebox
 
 # 使编译器能正确导入ico文件
 if getattr(sys, 'frozen', None):
     basedir = sys._MEIPASS
 else:
-    basedir = os.path.dirname(__file__)
+    basedir = path.dirname(__file__)
 
 win = Tk()
 win.withdraw()  # 禁用tkinter主窗口
 # 如果正确导入了ico文件则设置tkinter对话框图标
-if os.path.exists(os.path.join(basedir, "wangluo.ico")):
-    win.iconbitmap(os.path.join(basedir, "wangluo.ico"))
+if path.exists(path.join(basedir, "wangluo.ico")):
+    win.iconbitmap(path.join(basedir, "wangluo.ico"))
 
 
 # 写入配置文件
@@ -82,31 +83,26 @@ def write_json():
     # noinspection PyBroadException
     try:
         with open('./config.json', 'w', encoding='utf-8') as f:
-            json.dump(all_json, f, ensure_ascii=False, indent=4, allow_nan=False)
+            json_dump(all_json, f, ensure_ascii=False, indent=4, allow_nan=False)
+        f.close()
     except Exception as e:
-        print('尝试写入新配置文件时出错\n', e)
         error_message = '尝试写入新配置文件时出错\n' + str(e)
         messagebox.showerror(title='错误', message=error_message)
         sys.exit(1)
-    else:
-        print('已写入新配置文件')
-        f.close()
 
 
 def check_school_net(h):
-    system = system_type()
-    if system == 'Windows':
-        result = os.system(u'ping ' + h[0]['server'] + u' -n 1 -w 50')
-        CREATE_NO_WINDOW = 0x08000000
+    if os_type() == 'Windows':
+        result = system(u'ping ' + h[0]['server'] + u' -n 1 -w 50')
+        # CREATE_NO_WINDOW = 0x08000000
         DETACHED_PROCESS = 0x00000008
-        subprocess.call('taskkill /F /IM exename.exe', creationflags=CREATE_NO_WINDOW, shell=False)
+        subprocess.call('taskkill /F /IM exename.exe', creationflags=DETACHED_PROCESS, shell=False)
     else:
-        result = os.system(u'ping ' + h[0]['server'] + u' -c 1 -W 50')
+        result = system(u'ping ' + h[0]['server'] + u' -c 1 -W 50')
 
     if result == 0:
         return 1
     else:
-        print('当前不在校园网环境，程序自动退出！')
         messagebox.showwarning(title='警告', message='当前不在校园网环境，程序自动退出！')
         sys.exit(0)
 
@@ -116,16 +112,14 @@ def read_json():
         f = open('./config.json', mode='r', encoding='utf-8')
     except IOError:
         write_json()
-        print('配置文件不存在，已生成新配置文件，请填写配置文件后重试')
         messagebox.showwarning(title='警告', message='配置文件不存在，已生成新配置文件，请填写配置文件后重试!')
         sys.exit(1)
     else:
-        h = json.load(f)
-        print('已读取配置文件')
+        h = json_load(f)
+        # 读取配置文件
         f.close()
         if h[0]['login_url'] == 'http://127.0.0.1/eportal/InterFace.do?method=login' \
                 or h[0]['logout_url'] == 'http://127.0.0.1/eportal/InterFace.do?method=logout':
-            print('配置文件未填写完整，请填写配置文件后重试!')
             messagebox.showwarning(title='警告', message='配置文件未填写完整，请填写配置文件后重试!')
             sys.exit(1)
         if h[0]['allow_ping']:
