@@ -15,7 +15,7 @@ from winerror import ERROR_ALREADY_EXISTS
 import network_manager
 import rwjson
 
-# 使编译器能正确导入ico文件
+# 使pyinstaller能正确导入ico文件
 if getattr(sys, 'frozen', None):
     basedir = sys._MEIPASS
 else:
@@ -26,12 +26,10 @@ win.withdraw()  # 禁用tkinter主窗口
 toast = ToastNotifier()
 windows_ver = win32_ver()
 
-# 如果正确导入了ico文件则设置tkinter对话框图标
+# 如果正确导入了ico文件则设置tkinter对话框与win10 toast的图标
 if path.exists(path.join(basedir, 'wangluo.ico')):
     win.iconbitmap(path.join(basedir, 'wangluo.ico'))
     icon_path = path.join(basedir, 'wangluo.ico')
-else:
-    icon_path = 'wangluo.ico'
 
 
 # 目前未联网，尝试联网
@@ -129,5 +127,5 @@ if __name__ == '__main__':
         else:
             main(system_type)
     else:
-        # 系统不是Windows，直接启动
+        # 系统不是Windows，直接启动（没有Linux环境也懒得搞）
         main(system_type)
