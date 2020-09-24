@@ -17,15 +17,15 @@ else:
 win = Tk()
 win.withdraw()  # 禁用tkinter主窗口
 # 如果正确导入了ico文件则设置tkinter对话框图标
-if path.exists(path.join(basedir, "wangluo.ico")):
-    win.iconbitmap(path.join(basedir, "wangluo.ico"))
+if path.exists(path.join(basedir, 'wangluo.ico')):
+    win.iconbitmap(path.join(basedir, 'wangluo.ico'))
 
 
 # 写入配置文件
 def write_json():
     # 登录与登出的目标url及主程序是否需要检测校园网环境
     url = {
-        '警告1': '请不要增删本配置文件中的任何条目或改动顺序',
+        '警告1': '如不清楚作用，请不要增删本配置文件中的任何条目或改动顺序',
         '警告2': '请按照模板填写本配置文件',
         '提示': '本配置文件内容应来自于抓包，不排除将来可能会失效',
         'allow_ping指校园网登录服务器是否允许ping': '根据下面server项的值ping',
@@ -37,7 +37,7 @@ def write_json():
         'logout_url': 'http://127.0.0.1/eportal/InterFace.do?method=logout',
         'enable_disconnect': True
     }
-    # 登录传入参数
+    # 登录时传入参数
     login_data = {
         'userId': '00000000000',
         'password': '',
@@ -48,24 +48,32 @@ def write_json():
         'validcode': '',
         'passwordEncrypt': ''
     }
-    # 断线传入参数
+    # 断线时传入参数
     logout_data = {
         'userIndex': '',
     }
-    # 登录HTML Header
+    # 登录时的HTML Header
     login_header = {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         'Connection': 'keep-alive',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/85.0.4183.102 Safari/537.36 Edg/85.0.564.51',
+        'Accept': '*/*',
         'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
         'Accept-Encoding': 'gzip, deflate',
+        'Origin': 'http://127.0.0.1',
         'Referer': '',
     }
-    # 断线HTML Header
+    # 断线时的HTML Header
     logout_header = {
         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
         'Connection': 'keep-alive',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
+                      'Chrome/85.0.4183.102 Safari/537.36 Edg/85.0.564.51',
+        'Accept': '*/*',
         'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
         'Accept-Encoding': 'gzip, deflate',
+        'Origin': 'http://127.0.0.1',
         'Referer': '',
     }
 
@@ -75,7 +83,11 @@ def write_json():
         'EPORTAL_COOKIE_USERNAME': '',
         'EPORTAL_COOKIE_OPERATORPWD': '',
         'EPORTAL_COOKIE_DOMAIN': '',
-        'EPORTAL_COOKIE_PASSWORD': ''
+        'EPORTAL_COOKIE_PASSWORD': '',
+        'EPORTAL_COOKIE_SERVER': '',
+        'EPORTAL_COOKIE_SERVER_NAME': '',
+        'EPORTAL_COOKIE_USER_GROUP_NAME': '',
+        'JSESSIONID': ''
     }
 
     # 构造json文本

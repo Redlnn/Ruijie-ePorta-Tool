@@ -18,8 +18,8 @@ else:
 win = Tk()
 win.withdraw()  # 禁用tkinter主窗口
 # 如果正确导入了ico文件则设置tkinter对话框图标
-if path.exists(path.join(basedir, "wangluo.ico")):
-    win.iconbitmap(path.join(basedir, "wangluo.ico"))
+if path.exists(path.join(basedir, 'wangluo.ico')):
+    win.iconbitmap(path.join(basedir, 'wangluo.ico'))
 
 
 def connect_network():
