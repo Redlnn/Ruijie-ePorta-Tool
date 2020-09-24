@@ -1,20 +1,31 @@
-[
-    // 登录与登出的目标url及主程序是否需要检测校园网环境
-    {
-        "警告1": "如不清楚作用，请不要增删本配置文件中的任何条目或改动顺序",
-        "警告2": "请按照模板填写本配置文件",
-        "提示": "本配置文件内容应来自于抓包，不排除将来可能会失效",
-        "allow_ping指校园网登录服务器是否允许ping": "根据下面server项的值ping",
-        "login_url为登录时传参的地址": "logout_url为下线时传参的地址",
-        "enable_disconnect用于控制在网络已连接时运行脚本是否提示断网": "",
+{
+    "warn": {
+        "警告1": "除非抓到的包中有更多的参数，否则请不要增删本配置文件中的任何条目或改动顺序",
+        "提示1": "本配置文件内容可能需要根据学校服务器设置及时更新",
+        "提示2": "以下为各大项配置的用途解释",
+        "config": "本程序配置",
+        "server": "上下线时所连接的服务器的地址，请按格式填写",
+        "login_data": "上线联网时发送的参数，请按需增删",
+        "logout_data": "下线断网时发送的参数，请按需增删",
+        "login_header": "上线联网时使用的 HTML Header，Referer 项必填，Origin 项不改的话就删掉，其他项请按需增删",
+        "logout_header": "下线断网时使用的 HTML Header，Referer 项必填，Origin 项不改的话就删掉，其他项请按需增删",
+        "cookie": "连接登录服务器所使用的cookie，请在抓包时选择好运营商以及保存密码"
+    },
+    "config": {
+        "请不要随意修改config_version的值": "",
+        "config_version": 1,
+        "allow_ping指校园网登录服务器是否允许ping": "根据下面server项的值ping，若关闭则不检测是否为校园网环境",
+        "请填写校园网登录页的地址，不带http://或https://，结尾也不要有斜杠": "只填写ip或xx.xxx.com格式即可",
         "allow_ping": true,
         "server": "127.0.0.1",
-        "login_url": "http://127.0.0.1/eportal/InterFace.do?method=login",
-        "logout_url": "http://127.0.0.1/eportal/InterFace.do?method=logout",
+        "enable_disconnect用于控制在网络已连接时运行本程序是否弹出断网对话框": "",
         "enable_disconnect": true
     },
-    // 登录时传入参数
-    {
+    "server": {
+        "login_url": "http://127.0.0.1/eportal/InterFace.do?method=login",
+        "logout_url": "http://127.0.0.1/eportal/InterFace.do?method=logout"
+    },
+    "login_data": {
         "userId": "00000000000",
         "password": "",
         "service": "",
@@ -24,12 +35,10 @@
         "validcode": "",
         "passwordEncrypt": ""
     },
-    // 断线时传入参数
-    {
+    "logout_data": {
         "userIndex": ""
     },
-    // 登录时的HTML Header
-    {
+    "login_header": {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "Connection": "keep-alive",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36 Edg/85.0.564.51",
@@ -39,8 +48,7 @@
         "Origin": "http://127.0.0.1",
         "Referer": ""
     },
-    // 断线时的HTML Header
-    {
+    "logout_header": {
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
         "Connection": "keep-alive",
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.102 Safari/537.36 Edg/85.0.564.51",
@@ -50,9 +58,8 @@
         "Origin": "http://127.0.0.1",
         "Referer": ""
     },
-    // cookie
-    {
-        "EPORTAL_COOKIE_SAVEPASSWORD": "true",
+    "cookie": {
+        "EPORTAL_COOKIE_SAVEPASSWORD": "tre",
         "EPORTAL_AUTO_LAND": "",
         "EPORTAL_COOKIE_USERNAME": "",
         "EPORTAL_COOKIE_OPERATORPWD": "",
@@ -63,4 +70,4 @@
         "EPORTAL_COOKIE_USER_GROUP_NAME": "",
         "JSESSIONID": ""
     }
-]
+}

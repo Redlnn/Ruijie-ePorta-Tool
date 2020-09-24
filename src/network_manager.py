@@ -3,9 +3,9 @@
 import sys
 from json import loads as json_loads
 from os import path
-from tkinter import Tk, messagebox
+from tkinter import messagebox, Tk
 
-import requests
+from requests import post
 
 import rwjson
 
@@ -24,15 +24,15 @@ if path.exists(path.join(basedir, 'wangluo.ico')):
 
 def connect_network():
     f = rwjson.read_json()
-    url = f[0]['login_url']
-    data = f[1]
-    header = f[3]
-    cookie = f[5]
+    url = f['server']['login_url']
+    data = f['login_data']
+    header = f['login_header']
+    cookie = f['cookie']
 
     try:
-        res = requests.post(url=url, data=data, headers=header, cookies=cookie)
+        res = post(url=url, data=data, headers=header, cookies=cookie)
     except Exception as e:
-        error_message = '出现错误！\n错误信息：' + str(e)
+        error_message = '出现错误！\n\n错误信息：' + str(e)
         messagebox.showerror(title='未知错误', message=error_message)
         sys.exit(1)
     else:
@@ -43,14 +43,14 @@ def connect_network():
 
 def disconnect_network():
     f = rwjson.read_json()
-    url = f[0]['logout_url']
-    data = f[2]
-    header = f[4]
+    url = f['server']['logout_url']
+    data = f['logout_data']
+    header = f['logout_header']
 
     try:
-        res = requests.post(url=url, data=data, headers=header)
+        res = post(url=url, data=data, headers=header)
     except Exception as e:
-        error_message = '出现错误！\n错误信息：' + str(e)
+        error_message = '出现错误！\n\n错误信息：' + str(e)
         messagebox.showerror(title='未知错误', message=error_message)
         sys.exit(1)
     else:

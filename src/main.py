@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 import subprocess
 import sys
-from os import system, path
+from os import path, system
 from platform import system as os_type
 from platform import win32_ver
-from tkinter import Tk, messagebox
+from tkinter import messagebox, Tk
 
 from win10toast import ToastNotifier
 from win32api import GetLastError
@@ -60,7 +60,7 @@ def not_connected(system_type):
 def connected(system_type):
     # 目前状态：已联网
     f = rwjson.read_json()
-    if f[0]['enable_disconnect']:
+    if f['config']['enable_disconnect']:
         # 询问是否需要断网
         yesno1 = messagebox.askyesno(title='网络已连接', message='设备目前已联网，是否需要断网？', icon='info')
         if yesno1:
@@ -104,7 +104,7 @@ def main(system_type):
         else:
             not_connected(system_type)
     except Exception as e:
-        error_message = '出现未知错误，无法判断网络通断情况！\n是否要尝试联网？\n错误信息：' + str(e)
+        error_message = '出现未知错误，无法判断网络通断情况！\n是否要尝试联网？ 错误信息：\n\n' + str(e)
         yesno = messagebox.askyesno(title='未知错误', message=error_message, icon='error')
         if yesno:
             # 用户选择联网
