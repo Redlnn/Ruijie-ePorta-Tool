@@ -36,8 +36,7 @@ else:
 
 # 目前未联网，尝试联网
 def not_connected(system_type):
-    if system_type == 'Windows' and windows_ver[0] == '10':
-        toast.show_toast(u'网络检测', u'目前状态：未联网\n尝试联网...', icon_path=icon_path, duration=1.3)
+    # 目前状态：未联网
     status = network_manager.connect_network()
     if status['result'] == 'success' and status['message'] == '':
         if system_type == 'Windows' and windows_ver[0] == '10':
