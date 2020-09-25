@@ -39,8 +39,8 @@
 - 可以通过关闭断网提醒并添加至任务计划以定期检查防止设备断网
 - 某些 Windows 设备运行本脚本的 exe 版本可能需要安装 `Visual C++ 可再发行软件包 2015-2019` ，实在打不开建议 clone 本仓库后自行构建
 > VC++ 安装包：  
-> &nbsp;&nbsp;&nbsp;&nbsp;[果壳剥壳-微软常用运行库合集](https://www.ghpym.com/yxkhj.html)  
-> &nbsp;&nbsp;&nbsp;&nbsp;[微软官方-各版本下载合集](https://support.microsoft.com/zh-cn/help/2977003/the-latest-supported-visual-c-downloads)
+> &emsp;&emsp;[果壳剥壳 - 微软常用运行库合集](https://www.ghpym.com/yxkhj.html)  
+> &emsp;&emsp;[微软官方 - 各版本 Visual C++ 下载合集](https://support.microsoft.com/zh-cn/help/2977003/the-latest-supported-visual-c-downloads)
 
 ## Build 构建
 1. clone 本仓库;
