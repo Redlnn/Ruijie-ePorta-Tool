@@ -59,59 +59,60 @@ def not_connected(system_type):
 # 目前已联网，询问是否需要断网
 def connected(system_type):
     # 目前状态：已联网
-    f = rwjson.read_json()
-    if f['config']['enable_disconnect']:
-        # 询问是否需要断网
-        yesno1 = messagebox.askyesno(title='网络已连接', message='设备目前已联网，是否需要断网？', icon='info')
-        if yesno1:
-            # 用户选择断网，尝试断网
-            status = network_manager.disconnect_network()
-            if status['result'] == 'success':
-                if system_type == 'Windows' and windows_ver[0] == '10':
-                    toast.show_toast(u'已断网', u'断网成功！', icon_path=icon_path, duration=5)
-                else:
-                    messagebox.showinfo(title='已断网', message='断网成功！')
-            elif status['result'] == 'fail':
-                error_message1 = '断网失败！\n失败原因：' + status['message']
-                messagebox.showerror(title='断网失败', message=error_message1)
+    # 询问是否需要断网
+    yesno1 = messagebox.askyesno(title='网络已连接', message='设备目前已联网，是否需要断网？', icon='info')
+    if yesno1:
+        # 用户选择断网，尝试断网
+        status = network_manager.disconnect_network()
+        if status['result'] == 'success':
+            if system_type == 'Windows' and windows_ver[0] == '10':
+                toast.show_toast(u'已断网', u'断网成功！', icon_path=icon_path, duration=5)
             else:
-                error_message2 = '未知错误：' + str(status)
-                messagebox.showerror(title='错误', message=error_message2)
-            # print('返回值：', status)
-        # 用户选择不断网，程序自动退出
-        sys.exit(0)
-    else:
-        # 配置文件未启用"enable_disconnect"，程序自动退出
-        sys.exit(0)
+                messagebox.showinfo(title='已断网', message='断网成功！')
+        elif status['result'] == 'fail':
+            error_message1 = '断网失败！\n失败原因：' + status['message']
+            messagebox.showerror(title='断网失败', message=error_message1)
+        else:
+            error_message2 = '未知错误：' + str(status)
+            messagebox.showerror(title='错误', message=error_message2)
+        # print('返回值：', status)
+    # 用户选择不断网，程序自动退出
+    sys.exit(0)
 
 
 def main(system_type):
     # 先判断网络通断再执行操作
     # noinspection PyBroadException
-    try:
-        if system_type == 'Windows':
-            result = system(u'ping 119.29.29.29 -n 1 -w 1500')
-            si = subprocess.STARTUPINFO()
-            si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-            si.wShowWindow = subprocess.SW_HIDE  # default
-            # CREATE_NO_WINDOW = 0x08000000
-            DETACHED_PROCESS = 0x00000008
-            subprocess.call('taskkill /F /IM exename.exe', startupinfo=si, creationflags=DETACHED_PROCESS, shell=False)
-        else:
-            result = system(u'ping 119.29.29.29 -c 1 -W 1500')
-        if result == 0:
-            connected(system_type)
-        else:
-            not_connected(system_type)
-    except Exception as e:
-        error_message = '出现未知错误，无法判断网络通断情况！\n是否要尝试联网？ 错误信息：\n\n' + str(e)
-        yesno = messagebox.askyesno(title='未知错误', message=error_message, icon='error')
-        if yesno:
-            # 用户选择联网
-            not_connected(system_type)
-        else:
-            # 用户选择不联网，程序自动退出
-            sys.exit(1)
+    f = rwjson.read_json()
+    if f['config']['enable_disconnect']:
+        try:
+            if system_type == 'Windows':
+                result = system('ping 119.29.29.29 -n 1 -w 1500')
+                si = subprocess.STARTUPINFO()
+                si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+                si.wShowWindow = subprocess.SW_HIDE  # default
+                # CREATE_NO_WINDOW = 0x08000000
+                DETACHED_PROCESS = 0x00000008
+                subprocess.call('taskkill /F /IM exename.exe', startupinfo=si, creationflags=DETACHED_PROCESS,
+                                shell=False)
+            else:
+                result = system('ping 119.29.29.29 -c 1 -W 1500')
+            if result == 0:
+                connected(system_type)
+            else:
+                not_connected(system_type)
+        except Exception as e:
+            error_message = '出现未知错误，无法判断网络通断情况！\n是否要尝试联网？ 错误信息：\n\n' + str(e)
+            yesno = messagebox.askyesno(title='未知错误', message=error_message, icon='error')
+            if yesno:
+                # 用户选择联网
+                not_connected(system_type)
+            else:
+                # 用户选择不联网，程序自动退出
+                sys.exit(1)
+    else:
+        # 配置文件未启用"enable_disconnect"，程序将始终当作设备未联网
+        not_connected(system_type)
 
 
 if __name__ == '__main__':

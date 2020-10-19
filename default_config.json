@@ -14,11 +14,12 @@
     "config": {
         "请不要随意修改config_version的值": "",
         "config_version": 1,
-        "allow_ping指校园网登录服务器是否允许ping": "根据下面server项的值ping，若关闭则不检测是否为校园网环境",
+        "allow_ping 指校园网登录服务器是否允许ping": "根据下面server项的值ping，若关闭则不检测是否为校园网环境",
         "请填写校园网登录页的地址，不带http://或https://，结尾也不要有斜杠": "只填写ip或xx.xxx.com格式即可",
         "allow_ping": true,
         "server": "127.0.0.1",
-        "enable_disconnect用于控制在网络已连接时运行本程序是否弹出断网对话框": "",
+        "enable_disconnect 用于控制本程序是否判断网络通断以及在网络已连接时运行本程序是否弹出断网对话框": "",
+        "关闭后本程序将不再判断网络状况，始终当作设备未联网": "关闭本选项以及上方的 allow_ping 后将不会弹出 ping 命令的 CMD 窗口",
         "enable_disconnect": true
     },
     "server": {
