@@ -1,3 +1,5 @@
 /build/
 /dist/
 /src/config.json
+/src/test.py
+/.idea/

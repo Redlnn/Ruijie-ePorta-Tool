@@ -5,7 +5,6 @@ import sys
 from json import dump as json_dump
 from json import load as json_load
 from os import path, system
-from platform import system as os_type
 from tkinter import messagebox, Tk
 
 # 使编译器能正确导入ico文件
@@ -128,23 +127,6 @@ def write_json():
         sys.exit(1)
 
 
-# 判断当前网络环境是否为校园网，不是则退出
-def check_school_net(config):
-    if os_type() == 'Windows':
-        result = system(u'ping ' + config['config']['server'] + u' -n 1 -w 50')
-        # CREATE_NO_WINDOW = 0x08000000
-        DETACHED_PROCESS = 0x00000008
-        subprocess.call('taskkill /F /IM exename.exe', creationflags=DETACHED_PROCESS, shell=False)
-    else:
-        result = system(u'ping ' + config['config']['server'] + u' -c 1 -W 50')
-
-    if result == 0:
-        return 1
-    else:
-        messagebox.showwarning(title='警告', message='当前非校园网环境，程序自动退出！')
-        sys.exit(0)
-
-
 def read_json():
     try:
         f = open('./config.json', mode='r', encoding='utf-8')
@@ -169,9 +151,4 @@ def read_json():
                 or config['server']['logout_url'] == 'http://127.0.0.1/eportal/InterFace.do?method=logout':
             messagebox.showwarning(title='警告', message='配置文件未正确填写，请填写配置文件后重试!')
             sys.exit(1)
-
-        if config['config']['allow_ping']:
-            if check_school_net(config) == 1:
-                return config
-        else:
-            return config
+        return config
