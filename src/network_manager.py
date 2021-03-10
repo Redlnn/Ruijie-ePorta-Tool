@@ -7,11 +7,11 @@ from tkinter import messagebox, Tk
 
 from requests import post
 
-import rwjson
+import config
 
 # 使编译器能正确导入ico文件
 if getattr(sys, 'frozen', None):
-    basedir = sys._MEIPASS
+    basedir = sys._MEIPASS  # noqa
 else:
     basedir = path.dirname(__file__)
 
@@ -23,7 +23,7 @@ if path.exists(path.join(basedir, 'wangluo.ico')):
 
 
 def connect_network():
-    f = rwjson.read_json()
+    f = config.read_json()
     url = f['server']['login_url']
     data = f['login_data']
     header = f['login_header']
@@ -42,7 +42,7 @@ def connect_network():
 
 
 def disconnect_network():
-    f = rwjson.read_json()
+    f = config.read_json()
     url = f['server']['logout_url']
     data = f['logout_data']
     header = f['logout_header']
