@@ -143,15 +143,15 @@ def read_cfg() -> dict:
         f.close()
         # 检测配置文件版本
         if not config['config']['config_version']:
-            messagebox.showerror(title='警告', message='读取配置文件时出错，原因：\n\n    配置文件格式过期，请备份并删除原配置文件后运行本程序重新生成！')
+            messagebox.showerror(title='警告', message='读取配置文件时出错：\n配置文件格式过期，请备份并删除原配置文件后运行本程序重新生成！')
             sys.exit(1)
         else:
             if config['config']['config_version'] < current_config_version:
-                messagebox.showerror(title='警告', message='读取配置文件时出错，原因：\n\n    配置文件格式过期，请备份并删除原配置文件后运行本程序重新生成！')
+                messagebox.showerror(title='警告', message='读取配置文件时出错：\n配置文件格式过期，请备份并删除原配置文件后运行本程序重新生成！')
                 sys.exit(1)
             elif config['config']['config_version'] > current_config_version:
-                messagebox.showerror(title='警告', message='读取配置文件时出错，原因：\n\n    配置文件版本过高，请更新本程序。\n'
-                                                         '    如您使用的程序已是最新，请勿更改配置文件中"config_version"的值')
+                messagebox.showerror(title='警告', message='读取配置文件时出错：\n配置文件版本过高，请更新本程序。\n'
+                                     '如您使用的程序已是最新版本，请勿更改配置文件中"config_version"的值')
                 sys.exit(1)
 
         if config['login_data']['userId'] == '00000000000':

@@ -92,7 +92,7 @@ def connected():
         try:
             res = post(url=url, data=data, headers=header, cookies=cookie)
         except Exception as e:
-            error_message = f'出现错误！\n\n错误信息：{str(e)}'
+            error_message = f'出现错误:\n{str(e)}'
             messagebox.showerror(title='未知错误', message=error_message)
             sys.exit(1)
         else:
@@ -101,7 +101,7 @@ def connected():
             if status['result'] == 'success':
                 showinfo(title='已断网', msg='断网成功！', wait_time=5)
             elif status['result'] == 'fail':
-                error_message = f'断网失败！\n失败原因：{status["message"]}'
+                error_message = f'断网失败:\n{status["message"]}'
                 messagebox.showerror(title='断网失败', message=error_message)
             else:
                 error_message = f'未知错误：{str(status)}'
@@ -124,7 +124,7 @@ def disconnected():
     try:
         res = post(url=url, data=data, headers=header)
     except Exception as e:
-        error_message = f'出现错误！\n\n错误信息：{str(e)}'
+        error_message = f'出现错误:\n{str(e)}'
         messagebox.showerror(title='未知错误', message=error_message)
         sys.exit(1)
     else:
@@ -135,10 +135,10 @@ def disconnected():
         elif status['result'] == 'success' and status['message'] != '':
             showinfo(title='联网成功', msg=status['message'], wait_time=6)
         elif status['result'] == 'fail':
-            error_message = '联网失败！\n失败原因：' + status['message']
+            error_message = f'联网失败:\n{status["message"]}'
             messagebox.showerror(title='联网失败', message=error_message)
         elif status['result'] != 'success' and status['result'] != 'fail':
-            error_message = '未知错误：' + str(status)
+            error_message = f'未知错误:\n{str(status)}'
             messagebox.showerror(title='错误', message=error_message)
         print('服务器返回内容：', status)
     sys.exit(0)
@@ -151,7 +151,7 @@ def main():
 
     if cfg['config']['enable_school_network_check']:  # 判断当前网络环境是否在校园网内
         if not is_connected(host=cfg["config"]["server_url"], timeout=0.3):  # 判断是否能连接到校园网登录服务器
-            showinfo(title='网络环境', msg='当前不在校园网环境，不自动尝试连接校园网')
+            showinfo(title='非校园网环境', msg='当前不在校园网环境，不自动尝试连接校园网')
             sys.exit(0)
     if is_connected():  # 判断当前网络通断情况，以是否能打开百度主页来判断
         # 网络通
@@ -171,6 +171,6 @@ if __name__ == '__main__':
         mutex_name = 'ruijie_eporta_tool'  # noqa
         mutex = CreateMutex(None, False, mutex_name)
         if GetLastError() == ERROR_ALREADY_EXISTS:
-            messagebox.showerror(title='警告', message='本程序不能同时运行多个实例，请不要多开。\n若右下角仍有本程序通知，请关掉通知后重试！')
+            messagebox.showerror(title='警告', message='本程序不可多开。\n若右下角仍有本程序通知，请关掉通知后重试！')
             sys.exit(0)
     main()
