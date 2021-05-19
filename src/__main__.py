@@ -149,38 +149,28 @@ def main():
     主函数，判断网络通断情况并执行相应操作
     """
 
-    # 先判断网络通断再执行操作
-    if cfg['config']['enable_network_status_check']:  # 读配置文件，是否需要判断网络通断
-        if is_connected():  # 判断网络通断
-            connected()
+    if cfg['config']['enable_school_network_check']:  # 判断当前网络环境是否在校园网内
+        if not is_connected(host=cfg["config"]["server_url"], timeout=0.3):  # 判断是否能连接到校园网登录服务器
+            showinfo(title='网络环境', msg='当前不在校园网环境，不自动尝试连接校园网')
+            sys.exit(0)
+    if is_connected():  # 判断当前网络通断情况，以是否能打开百度主页来判断
+        # 网络通
+        if cfg['config']['enable_disconnect_network']:
+            connected()  # 若启用了'enable_disconnect_network'则询问用户是否需要断网
         else:
-            if cfg['config']['enable_school_network_check']:
-                if not is_connected(host=cfg["config"]["server_url"], timeout=0.3):  # 判断是否能连接到登录服务器
-                    # 如果无法连接到登录服务器则发送通知并退出
-                    showinfo(title='网络环境错误', msg='当前不在校园网环境，不自动尝试连接校园网')
-                    sys.exit(0)
-                else:
-                    disconnected()
-            else:
-                disconnected()  # 如果不判断是否能连接到登录服务器，则
+            showinfo(title='设备已联网', msg='网络本来就是通的噢~', wait_time=2)
     else:
-        disconnected()  # 配置文件未启用"enable_network_status_check"，程序将始终当作设备未联网
+        # 网络不通
+        disconnected()
+    sys.exit(0)
 
 
 if __name__ == '__main__':
-    # 判断系统类型
-    try:
-        if is_win:
-            # 检测多开
-            mutex_name = 'ruijie_eporta_tool'  # noqa
-            mutex = CreateMutex(None, False, mutex_name)
-            if GetLastError() == ERROR_ALREADY_EXISTS:
-                messagebox.showerror(title='警告', message='本程序不能同时运行多个实例，请不要多开。\n若右下角仍有本程序通知，请关掉通知后重试！')
-                sys.exit(0)
-            else:
-                main()
-        else:
-            # 系统不是Windows，直接启动（没有Linux环境也懒得搞）
-            main()
-    except KeyboardInterrupt:
-        sys.exit()
+    if is_win:
+        # 检测多开
+        mutex_name = 'ruijie_eporta_tool'  # noqa
+        mutex = CreateMutex(None, False, mutex_name)
+        if GetLastError() == ERROR_ALREADY_EXISTS:
+            messagebox.showerror(title='警告', message='本程序不能同时运行多个实例，请不要多开。\n若右下角仍有本程序通知，请关掉通知后重试！')
+            sys.exit(0)
+    main()

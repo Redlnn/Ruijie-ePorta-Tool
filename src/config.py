@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+
 import sys
 from json import dump as json_dump
 from json import load as json_load
@@ -43,8 +44,8 @@ def write_json():
         'enable_school_network_check': True,
         '选项解释-server_url': '校园网登录服务器的地址用于判断当前网络环境是否为校园网环境',
         'server_url': 'http://127.0.0.1',
-        '选项解释-enable_network_status_check': '是否判断网络通断，开启后在网络已连接时运行本程序将弹出是否需要断网的对话框',
-        'enable_network_status_check': True
+        '选项解释-enable_disconnect_network': '是否启用断网功能，开启后在网络已连接时运行本程序将可能弹出询问是否需要断网的对话框',
+        'enable_disconnect_network': True
     }
     # 上下线时所连接的服务器的地址
     server = {
@@ -125,7 +126,12 @@ def write_json():
         sys.exit(1)
 
 
-def read_cfg():
+def read_cfg() -> dict:
+    """
+    读取json配置文件，没有做异常处理及日志记录，因此在配置文件出错时可能比较难查找原因，建议重新生成
+
+    :return: 包含配置文件内容的字典
+    """
     try:
         f = open('config.json', mode='r', encoding='utf-8')
     except IOError:
