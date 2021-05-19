@@ -6,6 +6,7 @@ from json import loads as json_loads
 from os import path
 from platform import system as os_type
 from platform import win32_ver
+from time import sleep
 from tkinter import messagebox, Tk
 from urllib.request import urlopen
 
@@ -35,7 +36,8 @@ if os_type == 'Windows':
     toast = ToastNotifier()
     windows_ver = win32_ver()
     is_win = True
-    is_win10 = True if windows_ver[0] == '10' else False  # 如果windows版本等于10则is_win10为True，否则为False
+    is_win10 = True if windows_ver[0] == '10' else False
+    # 如果windows版本等于10则is_win10为True，否则为False
 else:
     is_win = False
     is_win10 = False
@@ -150,9 +152,15 @@ def main():
     """
 
     if cfg['config']['enable_school_network_check']:  # 判断当前网络环境是否在校园网内
-        if not is_connected(host=cfg["config"]["server_url"], timeout=0.3):  # 判断是否能连接到校园网登录服务器
-            showinfo(title='非校园网环境', msg='当前不在校园网环境，不自动尝试连接校园网')
-            sys.exit(0)
+        # 判断是否能连接到校园网登录服务器
+        if not is_connected(host=cfg["config"]["server_url"], timeout=3):
+            showinfo(title='非校园网环境',
+                     msg='当前不在校园网环境，稍等3s后重新检测\n若您的系统刚启动，可能还没反应过来，没有连上任何网络，为正常现象')
+            sleep(3)
+            if not is_connected(host=cfg["config"]["server_url"], timeout=1):
+                showinfo(title='非校园网环境',
+                         msg='当前不在校园网环境，不自动尝试联网，程序自动退出')
+                sys.exit(0)
     if is_connected():  # 判断当前网络通断情况，以是否能打开百度主页来判断
         # 网络通
         if cfg['config']['enable_disconnect_network']:
