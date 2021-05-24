@@ -158,3 +158,6 @@ def read_cfg() -> dict:
             messagebox.showwarning(title='警告', message='配置文件未正确填写，请填写配置文件后重试!')
             sys.exit(1)
         return config
+
+
+__all__ = [read_cfg]

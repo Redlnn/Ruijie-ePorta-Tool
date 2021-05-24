@@ -16,7 +16,7 @@ from win32api import GetLastError
 from win32event import CreateMutex
 from winerror import ERROR_ALREADY_EXISTS
 
-import config
+from config import read_cfg
 
 # 使 pyinstaller 能正确导入ico文件
 if getattr(sys, 'frozen', None):
@@ -42,7 +42,7 @@ else:
     is_win = False
     is_win10 = False
 
-cfg = config.read_cfg()  # 读取配置文件
+cfg = read_cfg()  # 读取配置文件
 
 
 def showinfo(title='Ruijie ePorta Tool', msg='test', wait_time=5):
@@ -155,18 +155,20 @@ def main():
         # 判断是否能连接到校园网登录服务器
         if not is_connected(host=cfg["config"]["server_url"], timeout=3):
             showinfo(title='非校园网环境',
-                     msg='当前不在校园网环境，稍等3s后重新检测\n若您的系统刚启动，可能还没反应过来，没有连上任何网络，为正常现象')
-            sleep(3)
-            if not is_connected(host=cfg["config"]["server_url"], timeout=1):
+                     msg='当前不在校园网环境，稍等10s后重新检测\n若您的系统刚启动，可能还没反应过来，没有连上任何网络，为正常现象')
+            sleep(10)
+            if not is_connected(host=cfg["config"]["server_url"], timeout=2):
                 showinfo(title='非校园网环境',
                          msg='当前不在校园网环境，不自动尝试联网，程序自动退出')
-                sys.exit(0)
+            else:
+                showinfo(title='设备已联网', msg='网络已连接，自动退出...', wait_time=4)
+            sys.exit(0)
     if is_connected():  # 判断当前网络通断情况，以是否能打开百度主页来判断
         # 网络通
         if cfg['config']['enable_disconnect_network']:
             connected()  # 若启用了'enable_disconnect_network'则询问用户是否需要断网
         else:
-            showinfo(title='设备已联网', msg='网络本来就是通的噢~', wait_time=2)
+            showinfo(title='设备已联网', msg='网络本来就是通的噢~', wait_time=4)
     else:
         # 网络不通
         disconnected()
