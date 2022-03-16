@@ -1,4 +1,0 @@
-win10toast~=0.9
-requests~=2.25.1
-pypiwin32~=223
-pywin32~=300

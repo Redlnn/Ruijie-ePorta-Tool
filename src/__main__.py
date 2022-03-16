@@ -1,17 +1,21 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
+import subprocess
 import sys
+from datetime import datetime
 from json import loads as json_loads
-from os import path
+from os.path import dirname, join
 from platform import system as os_type
 from platform import win32_ver
 from time import sleep
-from tkinter import messagebox, Tk
+from tkinter import Tk
+from tkinter.messagebox import askyesno, showerror, showinfo
+from urllib import parse, request
 from urllib.request import urlopen
 
-from requests import post
-from win10toast import ToastNotifier
+from tinyWinToast.tinyWinToast import Toast
 from win32api import GetLastError
 from win32event import CreateMutex
 from winerror import ERROR_ALREADY_EXISTS
@@ -19,168 +23,180 @@ from winerror import ERROR_ALREADY_EXISTS
 from config import read_cfg
 
 # 使 pyinstaller 能正确导入ico文件
-if getattr(sys, 'frozen', None):
-    basedir = sys._MEIPASS  # noqa
+if getattr(sys, 'frozen', None) or hasattr(sys, 'frozen'):
+    os.environ['PATH'] = sys._MEIPASS + ";" + os.environ['PATH']  # type: ignore # noqa
+    basedir = sys._MEIPASS or os.getcwd()  # type: ignore # noqa
 else:
-    basedir = path.dirname(__file__)
+    basedir = dirname(__file__)
+
+icon_path = join(basedir, 'wangluo.ico')
+
+
+class MyToast(Toast):
+    def show(self):
+        toaststr = self.__genXML()
+        si = subprocess.STARTUPINFO()
+        si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+        subprocess.run(["PowerShell", "-Command", toaststr], startupinfo=si)
+
 
 win = Tk()
 win.withdraw()  # 禁用tkinter主窗口
-# 设置tkinter对话框与win10 toast的图标
-if path.exists(path.join(basedir, 'wangluo.ico')):
-    win.iconbitmap(path.join(basedir, 'wangluo.ico'))
-    icon_path = path.join(basedir, 'wangluo.ico')
+win.iconbitmap(icon_path)  # 设置tkinter对话框与win10 toast的图标
 
-os_type = os_type()
-if os_type == 'Windows':
-    toast = ToastNotifier()
+is_win = False
+is_win10 = False
+
+if os_type() == 'Windows':
     windows_ver = win32_ver()
     is_win = True
     is_win10 = True if windows_ver[0] == '10' else False
     # 如果windows版本等于10则is_win10为True，否则为False
-else:
-    is_win = False
-    is_win10 = False
 
-cfg = read_cfg()  # 读取配置文件
+cfg = read_cfg()
+
+headers = {
+    'Connection': 'keep-alive',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36 Edg/99.0.1150.39',
+    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+    'Accept': '*/*',
+    'Accept-Encoding': 'gzip, deflate',
+    'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
+    'Cookie': parse.quote(cfg['cookie']),
+    'Host': cfg['url']['server'].replace('http://', '').replace('https://', ''),
+    'Origin': cfg['url']['server'].replace('http://', '').replace('https://', ''),
+}
+
+headers.update(cfg['headers'])
+
+login_data = cfg['login_data']
+logout_data = cfg['logout_data']
 
 
-def showinfo(title='Ruijie ePorta Tool', msg='test', wait_time=5):
-    """
-    发送tkinter通知框或win10的toast
+def notify(title: str = '锐捷 ePorta 连接工具', msg: str = ''):
+    """发送 tkinter 对话框或 win10+ 的 toast 通知
 
     :param title: 通知标题
     :param msg: 通知内容
-    :param wait_time: toast的展示时长
+    :param duration: toast的展示时长
     """
 
     if is_win and is_win10:
-        toast.show_toast(title=title, msg=msg, icon_path=icon_path, duration=wait_time, threaded=True)
+        toast = Toast()
+        toast.setAppID('锐捷 ePorta 连接工具')
+        toast.setTime(datetime.now().replace(microsecond=0).isoformat() + 'Z')
+        toast.setTitle(title)
+        toast.setMessage(msg, maxLines=5)
+        toast.setIcon(src=icon_path)
+        toast.addText(msg='锐捷 ePorta 连接工具', placement='attribution')
+        toast.show()
     else:
-        messagebox.showinfo(title=title, message=msg)
+        showinfo(title=title, message=msg)
 
 
-def is_connected(host='https://www.baidu.com', timeout=0.5) -> bool:
-    """
-    测试网络通断状态
+def test_internet(host: str = 'http://connect.rom.miui.com/generate_204', timeout: int = 1) -> bool:
+    """测试网络通断状态
 
-    :param host: 用于测试连接状态的地址（带 `http://` 或 `https://` 前缀）
-    :param timeout: 超时时间（单位：秒）
-    :return: 布尔值，True 为通，False 为不通
+    Args:
+        host(str): 用于测试连接状态的generate_204服务器地址
+        timeout(int): 超时时间（单位：秒）
+
+    Returns:
+        bool: True表示连接正常，False表示连接异常
     """
 
     try:
-        urlopen(host, timeout=timeout)  # Python 3.x
-        return True
+        resp = urlopen(host, timeout=timeout)
+        if host.endswith('generate_204'):
+            return True if resp.status == 204 else False
+        elif 200 <= resp.status <= 208 or resp.status == 226:
+            return True
+        return False
     except:  # noqa
         return False
 
 
-def connected():
-    """
-    当目前已联网时要执行的操作
+def disconnect():
+    """当目前已联网时要执行的操作"""
 
-    获取配置文件中填写好的header、data、cookie并发送至登录服务器，然后从服务器返回的json文本中判断结果
-    """
-
-    # 询问用户是否需要断网
-    if messagebox.askyesno(title='网络已连接', message='设备目前已联网，是否需要断网？', icon='info'):
-        # 用户选择断网，尝试断网
-        url = cfg['server']['logout_url']
-        data = cfg['logout_data']
-        header = cfg['logout_header']
-        cookie = cfg['cookie']
-
-        try:
-            res = post(url=url, data=data, headers=header, cookies=cookie)
-        except Exception as e:
-            error_message = f'出现错误:\n{str(e)}'
-            messagebox.showerror(title='未知错误', message=error_message)
-            sys.exit(1)
-        else:
-            res.encoding = 'utf-8'
-            status = json_loads(res.text)
-            if status['result'] == 'success':
-                showinfo(title='已断网', msg='断网成功！', wait_time=5)
-            elif status['result'] == 'fail':
-                error_message = f'断网失败:\n{status["message"]}'
-                messagebox.showerror(title='断网失败', message=error_message)
-            else:
-                error_message = f'未知错误：{str(status)}'
-                messagebox.showerror(title='错误', message=error_message)
-            print('服务器返回内容：', status)
-    sys.exit(0)
-
-
-def disconnected():
-    """
-    当目前没有联网时要执行的操作
-
-    获取配置文件中填写好的header、data、cookie并发送至登录服务器，然后从服务器返回的json文本中判断结果
-    """
-
-    url = cfg['server']['login_url']
-    data = cfg['login_data']
-    header = cfg['login_header']
+    resp = request.Request(
+        cfg['url']['server'] + cfg['url']['logout'],
+        data=bytes(parse.urlencode(login_data).encode('utf-8')),
+        headers=headers,
+        origin_req_host=None,
+        unverifiable=False,
+        method='POST',
+    )
 
     try:
-        res = post(url=url, data=data, headers=header)
+        res = request.urlopen(resp, timeout=10)
     except Exception as e:
         error_message = f'出现错误:\n{str(e)}'
-        messagebox.showerror(title='未知错误', message=error_message)
+        showerror(title='未知错误', message=error_message)
         sys.exit(1)
     else:
-        res.encoding = 'utf-8'
-        status = json_loads(res.text)
-        if status['result'] == 'success' and status['message'] == '':
-            showinfo(title='联网成功', msg='网络已连接！', wait_time=6)
-        elif status['result'] == 'success' and status['message'] != '':
-            showinfo(title='联网成功', msg=status['message'], wait_time=6)
+        status = json_loads(res.read().decode())
+        if status['result'] == 'success':
+            notify(title='已断网', msg='断网成功！')
         elif status['result'] == 'fail':
-            error_message = f'联网失败:\n{status["message"]}'
-            messagebox.showerror(title='联网失败', message=error_message)
+            showerror(title='断网失败', message=f'断网失败:\n{status["message"]}')
+        else:
+            showerror(title='错误', message=f'未知错误：{status}')
+
+
+def connect():
+    """当目前没有联网时要执行的操作"""
+
+    resp = request.Request(
+        cfg['url']['server'] + cfg['url']['login'],
+        data=bytes(parse.urlencode(login_data).encode('utf-8')) if login_data else None,
+        headers=headers,
+        origin_req_host=None,
+        unverifiable=False,
+        method='POST',
+    )
+
+    try:
+        res = request.urlopen(resp, timeout=10)
+    except Exception as e:
+        showerror(title='未知错误', message=f'出现错误:\n{str(e)}')
+        sys.exit(1)
+    else:
+        status = json_loads(res.read().decode())
+        if status['result'] == 'success' and status['message'] == '':
+            notify(title='联网成功', msg='网络已连接！')
+        elif status['result'] == 'success' and status['message'] != '':
+            notify(title='联网成功', msg=status['message'])
+        elif status['result'] == 'fail':
+            showerror(title='联网失败', message=f'未知错误:\n{status["message"]}')
         elif status['result'] != 'success' and status['result'] != 'fail':
-            error_message = f'未知错误:\n{str(status)}'
-            messagebox.showerror(title='错误', message=error_message)
-        print('服务器返回内容：', status)
-    sys.exit(0)
+            showerror(title='错误', message=f'未知错误:\n{status}')
 
 
 def main():
-    """
-    主函数，判断网络通断情况并执行相应操作
-    """
-
-    if cfg['config']['enable_school_network_check']:  # 判断当前网络环境是否在校园网内
-        # 判断是否能连接到校园网登录服务器
-        if not is_connected(host=cfg["config"]["server_url"], timeout=3):
-            showinfo(title='非校园网环境',
-                     msg='当前不在校园网环境，稍等10s后重新检测\n若您的系统刚启动，可能还没反应过来，没有连上任何网络，为正常现象')
+    if cfg['funtion']['check_school_network']:  # 通过是否能连接到校园网登录服务器判断当前网络环境是否在校园网内
+        if not test_internet(host=cfg['url']['server'], timeout=3):
+            notify(title='非校园网环境', msg='当前不在校园网环境，10s后重新检测\n若您的系统刚启动，可能还没反应过来，没有连上任何网络，为正常现象')
             sleep(10)
-            if not is_connected(host=cfg["config"]["server_url"], timeout=2):
-                showinfo(title='非校园网环境',
-                         msg='当前不在校园网环境，不自动尝试联网，程序自动退出')
-            else:
-                showinfo(title='设备已联网', msg='网络已连接，自动退出...', wait_time=4)
+            if not test_internet(host=cfg['url']['server'], timeout=2):
+                notify(title='非校园网环境', msg='当前不在校园网环境，不自动尝试联网，程序自动退出')
+                sys.exit(0)
+    if test_internet():
+        if cfg['funtion']['disconnect_network']:
+            if askyesno(title='网络已连接', message='设备目前已联网，是否需要断网？', icon='info'):
+                disconnect()
             sys.exit(0)
-    if is_connected():  # 判断当前网络通断情况，以是否能打开百度主页来判断
-        # 网络通
-        if cfg['config']['enable_disconnect_network']:
-            connected()  # 若启用了'enable_disconnect_network'则询问用户是否需要断网
         else:
-            showinfo(title='设备已联网', msg='网络本来就是通的噢~', wait_time=4)
-    else:
-        # 网络不通
-        disconnected()
-    sys.exit(0)
+            notify(title='设备已联网', msg='网络本来就是通的噢~')
+    connect()
 
 
 if __name__ == '__main__':
     if is_win:
         # 检测多开
-        mutex_name = 'ruijie_eporta_tool'  # noqa
-        mutex = CreateMutex(None, False, mutex_name)
+        mutex_name = 'ruijie_eporta_tool'
+        mutex = CreateMutex(None, False, mutex_name)  # type: ignore # noqa
         if GetLastError() == ERROR_ALREADY_EXISTS:
-            messagebox.showerror(title='警告', message='本程序不可多开。\n若右下角仍有本程序通知，请关掉通知后重试！')
+            showerror(title='警告', message='本程序不可多开。\n若右下角仍有本程序通知，请关掉通知后重试！')
             sys.exit(0)
     main()
