@@ -23,9 +23,9 @@ from winerror import ERROR_ALREADY_EXISTS
 from config import read_cfg
 
 # 使 pyinstaller 能正确导入ico文件
-if getattr(sys, 'frozen', None) or hasattr(sys, 'frozen'):
+if hasattr(sys, 'frozen'):
     os.environ['PATH'] = sys._MEIPASS + ";" + os.environ['PATH']  # type: ignore # noqa
-    basedir = sys._MEIPASS or os.getcwd()  # type: ignore # noqa
+    basedir = sys._MEIPASS  # type: ignore # noqa
 else:
     basedir = dirname(__file__)
 
