@@ -9,7 +9,7 @@ repository = "https://github.com/Redlnn/Ruijie-ePorta-Tool"
 
 [tool.poetry.dependencies]
 python = ">=3.9, <3.11"
-pywin32 = "^303"
+pywin32 = ">=303"
 tinywintoast = "^1.2"
 pyyaml = "^6.0"
 
@@ -17,7 +17,7 @@ pyyaml = "^6.0"
 black = ">=21.1.0"
 flake8 = ">=4.0.1"
 isort = {extras = ["requirements_deprecated_finder"], version = ">=5.10.1"}
-pyinstaller = "^4.10"
+pyinstaller = ">=4.10"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

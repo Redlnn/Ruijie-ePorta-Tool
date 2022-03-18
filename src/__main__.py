@@ -16,9 +16,6 @@ from urllib import parse, request
 from urllib.request import urlopen
 
 from tinyWinToast.tinyWinToast import Toast
-from win32api import GetLastError
-from win32event import CreateMutex
-from winerror import ERROR_ALREADY_EXISTS
 
 from config import read_cfg
 
@@ -48,10 +45,9 @@ is_win = False
 is_win10 = False
 
 if os_type() == 'Windows':
-    windows_ver = win32_ver()
     is_win = True
-    is_win10 = True if windows_ver[0] == '10' else False
-    # 如果windows版本等于10则is_win10为True，否则为False
+    if win32_ver()[0] in ('10', '11'):
+        is_win10 = True
 
 cfg = read_cfg()
 
@@ -64,7 +60,7 @@ headers = {
     'Accept-Language': 'zh-CN,zh;q=0.9,en-US;q=0.8,en;q=0.7',
     'Cookie': parse.quote(cfg['cookie']),
     'Host': cfg['url']['server'].replace('http://', '').replace('https://', ''),
-    'Origin': cfg['url']['server'].replace('http://', '').replace('https://', ''),
+    'Origin': cfg['url']['server'],
 }
 
 headers.update(cfg['headers'])
@@ -193,6 +189,10 @@ def main():
 
 if __name__ == '__main__':
     if is_win:
+        from win32api import GetLastError
+        from win32event import CreateMutex
+        from winerror import ERROR_ALREADY_EXISTS
+
         # 检测多开
         mutex_name = 'ruijie_eporta_tool'
         mutex = CreateMutex(None, False, mutex_name)  # type: ignore # noqa
