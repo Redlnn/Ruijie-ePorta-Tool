@@ -21,7 +21,7 @@ from config import read_cfg
 
 # 使 pyinstaller 能正确导入ico文件
 if hasattr(sys, 'frozen'):
-    os.environ['PATH'] = sys._MEIPASS + ";" + os.environ['PATH']  # type: ignore # noqa
+    os.environ['PATH'] = f"{sys._MEIPASS};" + os.environ['PATH']
     basedir = sys._MEIPASS  # type: ignore # noqa
 else:
     basedir = dirname(__file__)
@@ -63,7 +63,7 @@ headers = {
     'Origin': cfg['url']['server'],
 }
 
-headers.update(cfg['headers'])
+headers |= cfg['headers']
 
 login_data = cfg['login_data']
 logout_data = cfg['logout_data']
@@ -80,7 +80,7 @@ def notify(title: str = '锐捷 ePorta 连接工具', msg: str = ''):
     if is_win and is_win10:
         toast = Toast()
         toast.setAppID('锐捷 ePorta 连接工具')
-        toast.setTime(datetime.now().replace(microsecond=0).isoformat() + 'Z')
+        toast.setTime(f'{datetime.now().replace(microsecond=0).isoformat()}Z')
         toast.setTitle(title)
         toast.setMessage(msg, maxLines=5)
         toast.setIcon(src=icon_path)
@@ -104,7 +104,7 @@ def test_internet(host: str = 'http://connect.rom.miui.com/generate_204', timeou
     try:
         resp = urlopen(host, timeout=timeout)
         if host.endswith('generate_204'):
-            return True if resp.status == 204 else False
+            return resp.status == 204
         elif 200 <= resp.status <= 208 or resp.status == 226:
             return True
         return False
@@ -161,22 +161,23 @@ def connect():
         status = json_loads(res.read().decode())
         if status['result'] == 'success' and status['message'] == '':
             notify(title='联网成功', msg='网络已连接！')
-        elif status['result'] == 'success' and status['message'] != '':
+        elif status['result'] == 'success':
             notify(title='联网成功', msg=status['message'])
         elif status['result'] == 'fail':
             showerror(title='联网失败', message=f'未知错误:\n{status["message"]}')
-        elif status['result'] != 'success' and status['result'] != 'fail':
+        else:
             showerror(title='错误', message=f'未知错误:\n{status}')
 
 
 def main():
-    if cfg['funtion']['check_school_network']:  # 通过是否能连接到校园网登录服务器判断当前网络环境是否在校园网内
-        if not test_internet(host=cfg['url']['server'], timeout=3):
-            notify(title='非校园网环境', msg='当前不在校园网环境，10s后重新检测\n若您的系统刚启动，可能还没反应过来，没有连上任何网络，为正常现象')
-            sleep(10)
-            if not test_internet(host=cfg['url']['server'], timeout=2):
-                notify(title='非校园网环境', msg='当前不在校园网环境，不自动尝试联网，程序自动退出')
-                sys.exit(0)
+    if cfg['funtion']['check_school_network'] and not test_internet(
+        host=cfg['url']['server'], timeout=3
+    ):
+        notify(title='非校园网环境', msg='当前不在校园网环境，10s后重新检测\n若您的系统刚启动，可能还没反应过来，没有连上任何网络，为正常现象')
+        sleep(10)
+        if not test_internet(host=cfg['url']['server'], timeout=2):
+            notify(title='非校园网环境', msg='当前不在校园网环境，不自动尝试联网，程序自动退出')
+            sys.exit(0)
     if test_internet():
         if cfg['funtion']['disconnect_network']:
             if askyesno(title='网络已连接', message='设备目前已联网，是否需要断网？', icon='info'):
