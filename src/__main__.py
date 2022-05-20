@@ -21,7 +21,7 @@ from config import read_cfg
 
 # 使 pyinstaller 能正确导入ico文件
 if hasattr(sys, 'frozen'):
-    os.environ['PATH'] = f"{sys._MEIPASS};" + os.environ['PATH']
+    os.environ['PATH'] = f"{sys._MEIPASS};" + os.environ['PATH']  # type: ignore # noqa
     basedir = sys._MEIPASS  # type: ignore # noqa
 else:
     basedir = dirname(__file__)
@@ -170,6 +170,7 @@ def connect():
 
 
 def main():
+    # 通过是否能连接到校园网登录服务器判断当前网络环境是否在校园网内
     if cfg['funtion']['check_school_network'] and not test_internet(
         host=cfg['url']['server'], timeout=3
     ):
