@@ -1,5 +1,7 @@
 # Ruijie-ePorta-Tool
 
+**已毕业，不再维护，欢迎PR**
+
 一个基于 Python3 的自动登录/断开锐捷 ePorta Web 网页认证的工具（可开关功能，理论支持大部分学校）
 
 <img src="./example.png" alt="锐捷 ePorta Web 网页认证界面（webp图片无法打开请切换浏览器）" width="500px">
