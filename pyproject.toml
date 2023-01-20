@@ -9,15 +9,15 @@ repository = "https://github.com/Redlnn/Ruijie-ePorta-Tool"
 
 [tool.poetry.dependencies]
 python = ">=3.9, <3.11"
-pywin32 = ">=303"
-tinywintoast = "^1.2"
+pywin32 = "^305"
+tinywintoast = {git = "https://github.com/Redlnn/tinyWinToast.git"}
 pyyaml = "^6.0"
 
 [tool.poetry.dev-dependencies]
-black = ">=21.1.0"
-flake8 = ">=4.0.1"
-isort = {extras = ["requirements_deprecated_finder"], version = ">=5.10.1"}
-pyinstaller = ">=4.10"
+black = ">=22.12.0"
+flake8 = ">=6.0.0"
+isort = {extras = ["requirements_deprecated_finder"], version = ">=5.11.4"}
+pyinstaller = ">=5.7.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -28,19 +28,9 @@ name = "tuna-tsinghua"
 default = false
 url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 
-[[tool.poetry.source]]
-name = "aliyun"
-default = false
-url = "https://mirrors.aliyun.com/pypi/simple/"
-
-[[tool.poetry.source]]
-name = "tencent-cloud"
-default = false
-url = "https://mirrors.cloud.tencent.com/pypi/simple"
-
 [tool.black]
 line-length = 120
-target-version = ["py310"]
+target-version = ["py39", "py310"]
 skip-string-normalization = true
 safe = true
 
